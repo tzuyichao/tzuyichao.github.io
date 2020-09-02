@@ -145,6 +145,84 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/02/jc-cookbook-invoke-constructor/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Terence Chao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Expert Beginner">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/09/02/jc-cookbook-invoke-constructor/" class="post-title-link" itemprop="url">Javac (JC) Cookbook - How to create instance via invoke default constructor</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-09-02 09:46:09 / 修改時間：15:36:23" itemprop="dateCreated datePublished" datetime="2020-09-02T09:46:09+08:00">2020-09-02</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>lombok除了JSR 269之外的黑科技。簡單來說lombok是透過Java 6推出的JSR 269 (Pluggable Annotation Processing API)和修改AST這兩個東西，讓我們寫程式更輕鬆。</p>
+<p><code>JCTree</cdoe>就是讓我們可以處理Java AST的API。兩件事要先講，首先根據<code>JCTree</code>的JavaDoc寫類別名稱看到JC是javac的縮寫。接著，這些API是internal使用，有可能改變或刪除，如果要用後果自行負責。</p>
+<h2 id="How-to-create-instance-via-invoke-default-constructor"><a href="#How-to-create-instance-via-invoke-default-constructor" class="headerlink" title="How to create instance via invoke default constructor"></a>How to create instance via invoke default constructor</h2><h3 id="Question"><a href="#Question" class="headerlink" title="Question"></a>Question</h3><p>如何透過JCTree API增加一個呼叫default constructor產生物件?</p>
+<h3 id="Answer"><a href="#Answer" class="headerlink" title="Answer"></a>Answer</h3><p>透過<code>TreeMaker#NewClass()</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> JCNewClass <span class="title">NewClass</span><span class="params">(JCExpression encl,</span></span></span><br><span class="line"><span class="function"><span class="params">                         List&lt;JCExpression&gt; typeargs,</span></span></span><br><span class="line"><span class="function"><span class="params">                         JCExpression clazz,</span></span></span><br><span class="line"><span class="function"><span class="params">                         List&lt;JCExpression&gt; args,</span></span></span><br><span class="line"><span class="function"><span class="params">                         JCClassDecl def)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> SpeculativeNewClass(encl, typeargs, clazz, args, def, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>JCTree</code>可以看到<code>JCNewClass</code>類別。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * A new(...) operation.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">JCNewClass</span> <span class="keyword">extends</span> <span class="title">JCPolyExpression</span> <span class="keyword">implements</span> <span class="title">NewClassTree</span> </span>&#123;</span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+
+<p>下面是一個簡單的例子，透過呼叫<code>StringBuilder</code>的default constructor產生一個<code>StringBuilder</code>，後續使用<code>StringBuilder#append(str: String)</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">JCTree.JCExpression varType = query(<span class="string">&quot;java&quot;</span>, <span class="string">&quot;lang&quot;</span>, <span class="string">&quot;StringBuilder&quot;</span>);</span><br><span class="line"></span><br><span class="line">Name result = names.fromString(<span class="string">&quot;result&quot;</span>);</span><br><span class="line">JCTree.JCModifiers resultModifiers = treeMaker.Modifiers(Flags.PARAMETER);</span><br><span class="line"></span><br><span class="line">JCTree.JCNewClass stringBuilderClass = treeMaker.NewClass(<span class="keyword">null</span>,</span><br><span class="line">        com.sun.tools.javac.util.List.nil(),</span><br><span class="line">        varType,</span><br><span class="line">        com.sun.tools.javac.util.List.nil(),</span><br><span class="line">        <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">JCTree.JCVariableDecl resultIdent = treeMaker.VarDef(resultModifiers, result, varType, stringBuilderClass);</span><br></pre></td></tr></table></figure>
+
+<p>對應產生的Java code就是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">StringBuilder result = <span class="keyword">new</span> StringBuilder();</span><br></pre></td></tr></table></figure>
+
+<h3 id="Discussion"><a href="#Discussion" class="headerlink" title="Discussion"></a>Discussion</h3><h4 id="Anonymous-class-以Runnable為例"><a href="#Anonymous-class-以Runnable為例" class="headerlink" title="Anonymous class: 以Runnable為例"></a>Anonymous class: 以Runnable為例</h4><p>舉例來說，我們希望在AST裡加上如下列的內容</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Runnable r = <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>就會使用到<code>TreeMaker#NewClass()</code>的第五個參數。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">JCTree.JCExpression runnableType = query(<span class="string">&quot;java&quot;</span>, <span class="string">&quot;lang&quot;</span>, <span class="string">&quot;Runnable&quot;</span>);</span><br><span class="line"></span><br><span class="line">Name runnable = names.fromString(<span class="string">&quot;r&quot;</span>);</span><br><span class="line">JCTree.JCModifiers rModifiers = treeMaker.Modifiers(Flags.PARAMETER);</span><br><span class="line">ListBuffer&lt;JCTree.JCStatement&gt; runStatements = <span class="keyword">new</span> ListBuffer&lt;&gt;();</span><br><span class="line">JCTree.JCBlock rBody = treeMaker.Block(<span class="number">0</span>, runStatements.toList());</span><br><span class="line"></span><br><span class="line">JCTree.JCMethodDecl runMethod = treeMaker.MethodDef(</span><br><span class="line">        treeMaker.Modifiers(PUBLIC),</span><br><span class="line">        names.fromString(<span class="string">&quot;run&quot;</span>),</span><br><span class="line">        treeMaker.Type(<span class="keyword">new</span> Type.JCVoidType()),</span><br><span class="line">        com.sun.tools.javac.util.List.nil(),</span><br><span class="line">        com.sun.tools.javac.util.List.nil(),</span><br><span class="line">        com.sun.tools.javac.util.List.nil(),</span><br><span class="line">        rBody,</span><br><span class="line">        <span class="keyword">null</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">List&lt;JCTree&gt; defs = List.of(runMethod);</span><br><span class="line"></span><br><span class="line">JCTree.JCClassDecl classDecl = treeMaker.AnonymousClassDef(treeMaker.Modifiers(PARAMETER),</span><br><span class="line">        defs);</span><br><span class="line"></span><br><span class="line">JCTree.JCNewClass rClass = treeMaker.NewClass(<span class="keyword">null</span>,</span><br><span class="line">        com.sun.tools.javac.util.List.nil(),</span><br><span class="line">        runnableType,</span><br><span class="line">        com.sun.tools.javac.util.List.nil(),</span><br><span class="line">        classDecl);</span><br><span class="line"></span><br><span class="line">JCTree.JCVariableDecl rIdent = treeMaker.VarDef(rModifiers, runnable, runnableType, rClass);</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/25/java-method-overloading-extra-story/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -176,7 +254,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2020-08-26 08:08:32" itemprop="dateModified" datetime="2020-08-26T08:08:32+08:00">2020-08-26</time>
+                <time title="修改時間：2020-09-02 10:09:01" itemprop="dateModified" datetime="2020-09-02T10:09:01+08:00">2020-09-02</time>
               </span>
 
           
@@ -357,9 +435,13 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">3</span>
           <span class="site-state-item-name">文章</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">標籤</span>
       </div>
   </nav>
 </div>
