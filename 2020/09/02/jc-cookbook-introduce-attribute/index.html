@@ -20,15 +20,21 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Expert Beginner">
-<meta property="og:url" content="http://yoursite.com/archives/2020/index.html">
+  <meta name="description" content="Question對已經存在的類別加入新的attribute Answer作法是透過TreeMaker#VerDef()來產生新的variable的定義，然後透過JCClassDecl的defs#prepend()加到類別的Class Tree上。 以下是使用TreeMaker#VerDef()產生serialVersionUID的定義和初始化。 1234567private JCTree.JCVa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Javac (JC) Cookbook - How to introduce new attribute into exist class">
+<meta property="og:url" content="http://yoursite.com/2020/09/02/jc-cookbook-introduce-attribute/index.html">
 <meta property="og:site_name" content="Expert Beginner">
+<meta property="og:description" content="Question對已經存在的類別加入新的attribute Answer作法是透過TreeMaker#VerDef()來產生新的variable的定義，然後透過JCClassDecl的defs#prepend()加到類別的Class Tree上。 以下是使用TreeMaker#VerDef()產生serialVersionUID的定義和初始化。 1234567private JCTree.JCVa">
 <meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-09-02T15:50:40.000Z">
+<meta property="article:modified_time" content="2020-09-03T06:48:14.363Z">
 <meta property="article:author" content="Terence Chao">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="javac">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/archives/2020/">
+<link rel="canonical" href="http://yoursite.com/2020/09/02/jc-cookbook-introduce-attribute/">
 
 
 <script id="page-configurations">
@@ -36,12 +42,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-TW'
   };
 </script>
 
-  <title>歸檔 | Expert Beginner</title>
+  <title>Javac (JC) Cookbook - How to introduce new attribute into exist class | Expert Beginner</title>
   
 
 
@@ -139,110 +145,97 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共有 4 篇文章。 繼續努力。</span>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/02/jc-cookbook-introduce-attribute/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Terence Chao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Expert Beginner">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Javac (JC) Cookbook - How to introduce new attribute into exist class
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-09-02 23:50:40" itemprop="dateCreated datePublished" datetime="2020-09-02T23:50:40+08:00">2020-09-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-09-03 14:48:14" itemprop="dateModified" datetime="2020-09-03T14:48:14+08:00">2020-09-03</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2020</span>
+        <h3 id="Question"><a href="#Question" class="headerlink" title="Question"></a>Question</h3><p>對已經存在的類別加入新的attribute</p>
+<h3 id="Answer"><a href="#Answer" class="headerlink" title="Answer"></a>Answer</h3><p>作法是透過<code>TreeMaker#VerDef()</code>來產生新的variable的定義，然後透過<code>JCClassDecl</code>的<code>defs#prepend()</code>加到類別的Class Tree上。</p>
+<p>以下是使用<code>TreeMaker#VerDef()</code>產生<code>serialVersionUID</code>的定義和初始化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> JCTree.<span class="function">JCVariableDecl <span class="title">genSerialVersionUIDVariable</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    JCTree.JCModifiers modifiers = treeMaker.Modifiers(PRIVATE + STATIC + FINAL);</span><br><span class="line">    Name id = names.fromString(<span class="string">&quot;serialVersionUID&quot;</span>);</span><br><span class="line">    JCTree.JCExpression varType = treeMaker.Type(<span class="keyword">new</span> Type.JCPrimitiveType(TypeTag.LONG, <span class="keyword">null</span>));</span><br><span class="line">    JCTree.JCExpression init = treeMaker.Literal(<span class="number">1L</span>);</span><br><span class="line">    <span class="keyword">return</span> treeMaker.VarDef(modifiers, id, varType, init);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以下是把VariableTree加到ClassTree的寫法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jcClassDecl.defs = jcClassDecl.defs.prepend(genSerialVersionUIDVariable());</span><br></pre></td></tr></table></figure>
+
+<p>這個VariableTree對應的java程式碼如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1L</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Discussion"><a href="#Discussion" class="headerlink" title="Discussion"></a>Discussion</h3>
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+    
+    
+    
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-09-02T23:50:40+08:00"
-              content="2020-09-02">
-          09-02
-        </time>
-      </div>
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/javac/" rel="tag"># javac</a>
+          </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/09/02/jc-cookbook-introduce-attribute/" itemprop="url">
-            <span itemprop="name">Javac (JC) Cookbook - How to introduce new attribute into exist class</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-09-02T09:46:09+08:00"
-              content="2020-09-02">
-          09-02
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/09/02/jc-cookbook-invoke-constructor/" itemprop="url">
-            <span itemprop="name">Javac (JC) Cookbook - How to create instance via invoke default constructor</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-08-25T16:36:40+08:00"
-              content="2020-08-25">
-          08-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/08/25/java-method-overloading-extra-story/" itemprop="url">
-            <span itemprop="name">Java Method Overloading Extra Story</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-08-25T13:28:53+08:00"
-              content="2020-08-25">
-          08-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/08/25/hello-world/" itemprop="url">
-            <span itemprop="name">Hello World</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
+        
 
 
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/09/02/jc-cookbook-invoke-constructor/" rel="prev" title="Javac (JC) Cookbook - How to create instance via invoke default constructor">
+      <i class="fa fa-chevron-left"></i> Javac (JC) Cookbook - How to create instance via invoke default constructor
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-  </div>
+      </footer>
+    
+  </article>
   
   
-  
-
   
 
 
@@ -295,6 +288,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Question"><span class="nav-number">1.</span> <span class="nav-text">Question</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Answer"><span class="nav-number">2.</span> <span class="nav-text">Answer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Discussion"><span class="nav-number">3.</span> <span class="nav-text">Discussion</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

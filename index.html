@@ -145,6 +145,81 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/02/jc-cookbook-introduce-attribute/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Terence Chao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Expert Beginner">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/09/02/jc-cookbook-introduce-attribute/" class="post-title-link" itemprop="url">Javac (JC) Cookbook - How to introduce new attribute into exist class</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-09-02 23:50:40" itemprop="dateCreated datePublished" datetime="2020-09-02T23:50:40+08:00">2020-09-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-09-03 14:48:14" itemprop="dateModified" datetime="2020-09-03T14:48:14+08:00">2020-09-03</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Question"><a href="#Question" class="headerlink" title="Question"></a>Question</h3><p>對已經存在的類別加入新的attribute</p>
+<h3 id="Answer"><a href="#Answer" class="headerlink" title="Answer"></a>Answer</h3><p>作法是透過<code>TreeMaker#VerDef()</code>來產生新的variable的定義，然後透過<code>JCClassDecl</code>的<code>defs#prepend()</code>加到類別的Class Tree上。</p>
+<p>以下是使用<code>TreeMaker#VerDef()</code>產生<code>serialVersionUID</code>的定義和初始化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> JCTree.<span class="function">JCVariableDecl <span class="title">genSerialVersionUIDVariable</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    JCTree.JCModifiers modifiers = treeMaker.Modifiers(PRIVATE + STATIC + FINAL);</span><br><span class="line">    Name id = names.fromString(<span class="string">&quot;serialVersionUID&quot;</span>);</span><br><span class="line">    JCTree.JCExpression varType = treeMaker.Type(<span class="keyword">new</span> Type.JCPrimitiveType(TypeTag.LONG, <span class="keyword">null</span>));</span><br><span class="line">    JCTree.JCExpression init = treeMaker.Literal(<span class="number">1L</span>);</span><br><span class="line">    <span class="keyword">return</span> treeMaker.VarDef(modifiers, id, varType, init);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以下是把VariableTree加到ClassTree的寫法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jcClassDecl.defs = jcClassDecl.defs.prepend(genSerialVersionUIDVariable());</span><br></pre></td></tr></table></figure>
+
+<p>這個VariableTree對應的java程式碼如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1L</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Discussion"><a href="#Discussion" class="headerlink" title="Discussion"></a>Discussion</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/02/jc-cookbook-invoke-constructor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -168,10 +243,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">發表於</span>
-              
 
-              <time title="創建時間：2020-09-02 09:46:09 / 修改時間：16:44:22" itemprop="dateCreated datePublished" datetime="2020-09-02T09:46:09+08:00">2020-09-02</time>
+              <time title="創建時間：2020-09-02 09:46:09" itemprop="dateCreated datePublished" datetime="2020-09-02T09:46:09+08:00">2020-09-02</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-09-03 09:10:40" itemprop="dateModified" datetime="2020-09-03T09:10:40+08:00">2020-09-03</time>
+              </span>
 
           
 
@@ -186,7 +267,10 @@
       
           <p>lombok除了JSR 269之外的黑科技。簡單來說lombok是透過Java 6推出的JSR 269 (Pluggable Annotation Processing API)和修改AST這兩個東西，讓我們寫程式更輕鬆。</p>
 <p><code>JCTree</code>就是讓我們可以處理Java AST的API。兩件事要先講，首先根據<code>JCTree</code>的JavaDoc寫類別名稱看到JC是javac的縮寫。接著，這些API是internal使用，有可能改變或刪除，如果要用後果自行負責。</p>
-<h2 id="How-to-create-instance-via-invoke-default-constructor"><a href="#How-to-create-instance-via-invoke-default-constructor" class="headerlink" title="How to create instance via invoke default constructor"></a>How to create instance via invoke default constructor</h2><h3 id="Question"><a href="#Question" class="headerlink" title="Question"></a>Question</h3><p>如何透過JCTree API增加一個呼叫default constructor產生物件?</p>
+<blockquote>
+<p>This is NOT part of any supported API. If you write code that depends on this, you do so at your own risk. This code and its internal interfaces are subject to change or deletion without notice.</p>
+</blockquote>
+<h3 id="Question"><a href="#Question" class="headerlink" title="Question"></a>Question</h3><p>如何透過JCTree API增加一個呼叫default constructor產生物件?</p>
 <h3 id="Answer"><a href="#Answer" class="headerlink" title="Answer"></a>Answer</h3><p>透過<code>TreeMaker#NewClass()</code></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> JCNewClass <span class="title">NewClass</span><span class="params">(JCExpression encl,</span></span></span><br><span class="line"><span class="function"><span class="params">                         List&lt;JCExpression&gt; typeargs,</span></span></span><br><span class="line"><span class="function"><span class="params">                         JCExpression clazz,</span></span></span><br><span class="line"><span class="function"><span class="params">                         List&lt;JCExpression&gt; args,</span></span></span><br><span class="line"><span class="function"><span class="params">                         JCClassDecl def)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> SpeculativeNewClass(encl, typeargs, clazz, args, def, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -435,7 +519,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
